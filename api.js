@@ -169,5 +169,6 @@ module.exports = router;
 
 // one a side note jacob i really think you should remove all those if elses for checking body data shit stuff.
 // also please get ids to be randomly generated 
+// ok lets test to see if this workflow well, works
 
 // DROP TABLE posts; DROP TABLE users; DROP TABLE likes; DROP TABLE comments; CREATE TABLE posts (id INT, title CHAR(10), content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE users(id INT, username CHAR(10), password CHAR(16)); CREATE TABLE likes (post_id INT, user_id INT); CREATE TABLE comments (comment_id INT, post_id INT, content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE replies (id INT, comment_id INT, content CHAR(500), user_id INT, date CHAR(30)); INSERT INTO users VALUES ('1', 'admin', 'password'); INSERT INTO users VALUES ('2', 'mooshoe', 'moocowspassword'); INSERT INTO posts VALUES ('1000000', 'First post!', '{content}', '1', '2018-12-09T17:09:47+00:00'); INSERT INTO likes VALUES ('1000000', '1'); INSERT INTO comments VALUES ('1', '1000000', '{comment}', '1', '2018-12-14T00:17:46+00:00'); INSERT INTO replies VALUES ('1', '1', '{reply}', '2', '2018-12-15T19:26:41+00:00');
