@@ -4,10 +4,17 @@ This is the REST API for skfs, which can be used to access the site to create bo
 
 ## Table of contents
 #### REST api
-* [POST /api/v1/token](#POST-/api/v1/token)
-* [GET /api/v1/timeline](#POST-/api/v1/timeline)
-* [GET /api/v1/posts/:id](#POST-/api/v1/:id)
+* [POST /api/v1/token](#post-apiv1token)
+* [GET /api/v1/timeline](#post-apiv1timeline)
+* [GET /api/v1/posts/:id](#post-apiv1id)
+* [POST /api/v1/post](#post-apiv1post)
+* [POST /api/v1/posts/:id/like](#post-apiv1postsidlike)
+* [POST /api/v1/posts/:id/unlike](#post-apiv1postsidunlike)
+* [POST /api/v1/posts/:id/comment](#post-apiv1postsidcomment)
+* [POST /api/v1/posts/:id/reply](#post-apiv1postsidreply)
 #### Entities
+* [User](#user)
+* [Post](#post)
 
 ### POST /api/v1/token
 
@@ -30,11 +37,11 @@ Returns [Token](#Token)
 | username | The username of the user you want to log into. | Yes |
 | password | Password of the user you want to log into. | Yes |
 
-#### GET /api/v1/timeline
+### GET /api/v1/timeline
 
 This is the the firehose timeline of the instance, which contains the 20 most recent posts.
 
-Returns an array [Post](#Post)
+Returns an array of [Post.](#post)
 
 #### Resource Information
 
@@ -48,7 +55,7 @@ Returns an array [Post](#Post)
 
 Gives you a post, when given an id.
 
-Returns [Post](#Post)
+Returns [Post.](#post)
 
 #### Resource Information
 
@@ -106,7 +113,7 @@ Likes a post. You can only do this once. ;)
 | Requires token | Yes |
 | Available since | 0.0.0 |
 
-### POST /api/v1/post/:id/comment
+### POST /api/v1/posts/:id/comment
 
 Comments on post.
 
@@ -125,7 +132,7 @@ Comments on post.
 | token | Your personal token | Yes |
 | comment | Contents of your comment | Yes |
 
-### POST /api/v1/post/:id/reply
+### POST /api/v1/posts/:id/reply
 
 Reply to a comment using this. You cannot reply to a reply, but replying to a comment mentioning someone in the reply works.
 
@@ -147,4 +154,40 @@ Reply to a comment using this. You cannot reply to a reply, but replying to a co
 
 ## Entities
 
-### ima do this shit later
+Entities in the skfs api. All dates are in ISO 8601 format.
+
+### User
+| Attribute | Type | Nullable | Added in |
+| - | - | - | - |
+| `error` | String | ✅ | 0.0.0 |
+| `id` | int | ❌ | 0.0.0 |
+| `username` | String | ❌ | 0.0.0 |
+
+### Post
+| Attribute | Type | Nullable | Added in |
+| - | - | - | - |
+| `error` | String | ✅ | 0.0.0 |
+| `id` | int | ❌ | 0.0.0 |
+| `title` | String | ❌ | 0.0.0 |
+| `content` | String | ❌ | 0.0.0 |
+| `likes` | Array of [User](#user) | ❌ | 0.0.0 |
+| `comments` | Array of [Comment](#comment) | ❌ | 0.0.0 |
+| `date_created` | String | ❌ | 0.0.0 |
+
+### Comment
+| Attribute | Type | Nullable | Added in |
+| - | - | - | - |
+| `id` | String | ❌ | 0.0.0 |
+| `user` | [User](#user) | ❌ | 0.0.0 |
+| `post_id` | String | ❌ | 0.0.0 |
+| `comment` | String | ❌ | 0.0.0 |
+| `replies` | Array of [Reply](#reply) | 0.0.0 |
+| `date_created` | String | ❌ | 0.0.0 |
+
+### Reply
+| Attribute | Type | Nullable | Added in |
+| - | - | - | - |
+| `id` | String | ❌ | 0.0.0 |
+| `user` | [User](#user) | ❌ | 0.0.0 |
+| `reply` | String | ❌ | 0.0.0 |
+| `date_created` | String | ❌ | 0.0.0 |
