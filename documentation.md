@@ -5,8 +5,8 @@ This is the REST API for skfs, which can be used to access the site to create bo
 ## Table of contents
 #### REST api
 * [POST /api/v1/token](#post-apiv1token)
-* [GET /api/v1/timeline](#post-apiv1timeline)
-* [GET /api/v1/posts/:id](#post-apiv1id)
+* [GET /api/v1/timeline](#get-apiv1timeline)
+* [GET /api/v1/posts/:id](#get-apiv1id)
 * [POST /api/v1/post](#post-apiv1post)
 * [POST /api/v1/posts/:id/like](#post-apiv1postsidlike)
 * [POST /api/v1/posts/:id/unlike](#post-apiv1postsidunlike)
@@ -152,9 +152,70 @@ Reply to a comment using this. You cannot reply to a reply, but replying to a co
 | reply | Contents of your comment | Yes |
 | comment_id | ID of the comment you want to reply to | Yes |
 
+### DELETE /api/v1/posts/:id
+
+Deletes a post.
+
+#### Resource Information
+
+| Information | ? |
+|-|-|
+| Response format | Json |
+| Requires token | Yes |
+| Available since | 0.0.0 |
+
+#### Paramaters
+
+| Name | Description | Required |
+| - | - | - |
+| token | Your personal token | Yes |
+
+### DELETE /api/v1/comment
+
+Deletes a comment.
+
+#### Resource Information
+
+| Information | ? |
+|-|-|
+| Response format | Json |
+| Requires token | Yes |
+| Available since | 0.0.0 |
+
+#### Paramaters
+
+| Name | Description | Required |
+| - | - | - |
+| token | Your personal token | Yes |
+| comment_id | The comment you want to delete | Yes |
+
+### DELETE /api/v1/reply
+
+Deletes a reply.
+
+#### Resource Information
+
+| Information | ? |
+|-|-|
+| Response format | Json |
+| Requires token | Yes |
+| Available since | 0.0.0 |
+
+#### Paramaters
+
+| Name | Description | Required |
+| - | - | - |
+| token | Your personal token | Yes |
+| reply_id | The reply you want to delete | Yes |
+
 ## Entities
 
 Entities in the skfs api. All dates are in ISO 8601 format.
+
+### Token
+| Attribute | Type | Nullable | Added in |
+| - | - | - | - |
+| `token` | String | ✅ | 0.0.0 |
 
 ### User
 | Attribute | Type | Nullable | Added in |

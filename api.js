@@ -149,33 +149,43 @@ router.post("/posts/:id/reply", protect, function(req, res) {
   }
 });
 
-router.delete("/posts/:id/reply", protect, function(req, res) {
+router.delete("/posts/:id", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
-  const reply = db.prepare("SELECT * FROM replies WHERE id = ?").get(req.body.reply_id);
-  if (post == undefined) 
+  if (post == undefined)
     res.json({"error": "id"});
-  else if (reply == undefined)
-    res.json({"error": "reply_id"});
-  else if (reply.user_id != req.account.id)
+  else if (post.user_id != req.account.id)
     res.json({"error": "ownership"});
   else {
-    db.prepare("DELETE FROM replies WHERE id = ?").run(req.body.reply_id);
-    res.json({"status": "ok"});
+    for (const comment of db.prepare("SELECT * FROM comments WHERE post_id = ?").all(post.id)) {
+      db.prepare("DELETE FROM replies WHERE comment_id = ?").run(comment.comment_id);
+      db.prepare("DELETE FROM comments WHERE comment_id = ?").run(comment.comment_id);
+    }
+    db.prepare("DELETE FROM posts WHERE id = ?").run(post.id);
+    db.prepare("DELETE FROM likes WHERE post_id = ?").run(post.id);
   }
 });
 
-router.delete("/posts/:id/comment", protect, function(req, res) {
-  const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
+router.delete("/comment", protect, function(req, res) {
   const comment = db.prepare("SELECT * FROM comments WHERE comment_id = ?").get(req.body.comment_id);
-  if (post == undefined)
-    res.json({"error": "id"});
-  else if (comment == undefined)
+  if (comment == undefined)
     res.json({"error": "comment_id"});
   else if (comment.user_id != req.account.id)
     res.json({"error": "ownership"});
   else {
     db.prepare("DELETE FROM replies WHERE comment_id = ?").run(req.body.comment_id);
     db.prepare("DELETE FROM comments WHERE comment_id = ?").run(req.body.comment_id);
+    res.json({"status": "ok"});
+  }
+});
+
+router.delete("/reply", protect, function(req, res) {
+  const reply = db.prepare("SELECT * FROM replies WHERE id = ?").get(req.body.reply_id);
+  if (reply == undefined)
+    res.json({"error": "reply_id"});
+  else if (reply.user_id != req.account.id)
+    res.json({"error": "ownership"});
+  else {
+    db.prepare("DELETE FROM replies WHERE id = ?").run(req.body.reply_id);
     res.json({"status": "ok"});
   }
 });
@@ -241,9 +251,10 @@ router.get("/timeline", function(req, res) {
 
 module.exports = router;
 
-// get deletion working
-// also please get ids to be randomly generated and change comment_id to id
 // better errors
 // improve accounts???/!?!? (including passwords that are hashed)
+// notifications
+
+// random ids???
 
 // CREATE TABLE posts (id INT, title CHAR(10), content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE users(id INT, username CHAR(10), password CHAR(16)); CREATE TABLE likes (post_id INT, user_id INT); CREATE TABLE comments (comment_id INT, post_id INT, content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE replies (id INT, comment_id INT, content CHAR(500), user_id INT, date CHAR(30)); INSERT INTO users VALUES ('1', 'admin', 'password'); INSERT INTO users VALUES ('2', 'mooshoe', 'moocowspassword'); INSERT INTO posts VALUES ('1000000', 'First post!', '{content}', '1', '2018-12-09T17:09:47+00:00'); INSERT INTO likes VALUES ('1000000', '1'); INSERT INTO comments VALUES ('1', '1000000', '{comment}', '1', '2018-12-14T00:17:46+00:00'); INSERT INTO replies VALUES ('1', '1', '{reply}', '2', '2018-12-15T19:26:41+00:00');
