@@ -12,9 +12,15 @@ This is the REST API for skfs, which can be used to access the site to create bo
 * [POST /api/v1/posts/:id/unlike](#post-apiv1postsidunlike)
 * [POST /api/v1/posts/:id/comment](#post-apiv1postsidcomment)
 * [POST /api/v1/posts/:id/reply](#post-apiv1postsidreply)
+* [DELETE /api/v1/post/:id](#delete-apiv1postsid)
+* [DELETE /api/v1/comment](#delete-apiv1comment)
+* [DELETE /api/v1/reply](#delete-apiv1reply)
 #### Entities
+* [Token](#token)
 * [User](#user)
 * [Post](#post)
+* [Comment](#comment)
+* [Reply](#reply)
 
 ### POST /api/v1/token
 

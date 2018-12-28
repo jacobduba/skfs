@@ -12,7 +12,7 @@ function protect(req, res, next) {
     req.account = db.prepare("SELECT * FROM users WHERE id = ?"). get(jwt.verify(req.body.token, process.env.SECRET).id);
     next();
   } catch (e) {
-    res.json({"error": "token"});
+    res.status(401).json({"status": 401, "message": "You have not supplied a valid token."});
   }
 }
 
@@ -20,18 +20,18 @@ function protect(req, res, next) {
 router.post("/token", function(req, res) {
   const account = db.prepare("SELECT * FROM users WHERE username = ?").get(req.body.username);
   if (account == undefined) {
-    res.json({"error": "username"});
+    res.status(400).json({"status": 400, "message": "You have not supplied a user that exist."});
   } else if (req.body.password != account.password) {
-    res.json({"error": "password"});
+    res.status(400).json({"status": 400, "message": "You have the incorrect password for your user."});
   } else {
-    res.json({"error": undefined, "token": jwt.sign({ id: account.id }, process.env.SECRET)});
+    res.status(200).json({"token": jwt.sign({ id: account.id }, process.env.SECRET)});
   }
 });
 
 router.get("/posts/:id", function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
-    res.json({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(post.user_id);
 
   var comments = [];
@@ -72,7 +72,7 @@ router.get("/posts/:id", function(req, res) {
     });
   }
 
-  res.json({
+  res.status(200).json({
     id: post.id,
     user: {
       id: user.id,
@@ -88,73 +88,73 @@ router.get("/posts/:id", function(req, res) {
 
 router.post("/post", protect, function(req, res) {
   if (req.body.title == undefined)
-    res.json({"error": "no title"});
+    res.status(400).json({"status": 400, "message": "You must suply a title."});
   else if (req.body.content == undefined)
-    res.send({"error": "no content"});
+    res.status(400).json({"status": 400, "message": "You must suply the content param."});
   const id = db.prepare("SELECT MAX(id) FROM posts").get()["MAX(id)"] + 1;
   db.prepare("INSERT INTO posts VALUES (?, ?, ?, ?, ?)").run(id, req.body.title, req.body.content, req.account.id, moment().format());
   db.prepare("INSERT INTO likes VALUES (?, ?)").run(id, req.account.id);
-  res.json({"status": "ok"});
+  res.status(200).json({"status": 200});
 });
 
 router.post("/posts/:id/like", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
-    res.json({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   const likes = db.prepare("SELECT * FROM (SELECT * FROM likes WHERE post_id = ?) WHERE user_id = ?").get(req.params.id, req.account.id);
   if (likes != undefined) {
-    res.json({"error": "already liked"});
+    res.status(400).json({"status": 400, "message": "Already liked the post."});
   } else {
     db.prepare("INSERT INTO likes VALUES (?, ?)").run(req.params.id, req.account.id);
-    res.json({"status": "ok"});
+    res.status(200).json({"status": 200});
   }
 });
 
 router.post("/posts/:id/unlike", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
-    res.json({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   const like = db.prepare("SELECT * FROM likes WHERE user_id = ? and post_id = ?").get(req.account.id, req.params.id);
   if (like == undefined)
-    res.json({"error": "not liked"});
+    res.status(400).json({"status": 400, "message": "Already don't like this post."});
   db.prepare("DELETE FROM likes WHERE user_id = ? and post_id = ?").run(req.account.id, req.params.id);
-  res.json({"status": "ok"});
+  res.status(200).json({"status": 200});
 });
 
 router.post("/posts/:id/comment", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined) 
-    res.send({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   else if (req.body.comment == undefined)
-    res.send({"error": "no comment"});
+    res.status(400).json({"status": 400, "message": "You must provide a 'comment' paramater."});
   else {
     const id = db.prepare("SELECT MAX(comment_id) FROM comments").get()["MAX(comment_id)"] + 1;
     db.prepare("INSERT INTO comments VALUES (?, ?, ?, ?, ?)").run(id, req.params.id, req.body.comment, req.account.id, moment().format());
-    res.send({"status": "ok"});
+    res.status(200).json({"status": 200});
   }
 });
 
 router.post("/posts/:id/reply", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
-    res.json({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   else if (db.prepare("SELECT * FROM comments WHERE comment_id = ?").get(req.body.comment_id) == undefined)
-    res.json({"error": "comment_id"});
+    res.status(404).json({"status": 404, "message": "The comment provided from the 'comment_id' paramater does not exist."});
   else if (req.body.reply == undefined)
-    res.json({"error": "no reply"});
+    res.status(400).json({"status": 400, "message": "You must provide a 'reply' paramater."});
   else {
     const id = db.prepare("SELECT MAX(id) FROM replies").get()["MAX(id)"] + 1;
     db.prepare("INSERT INTO replies VALUES (?, ?, ?, ?, ?)").run(id, req.body.comment_id, req.body.reply, req.account.id, moment().format());
-    res.json({"status": "ok"});
+    res.status(200).json({"status": 200});
   }
 });
 
 router.delete("/posts/:id", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
-    res.json({"error": "id"});
+    res.status(404).json({"status": 404, "message": "Post does not exist."});
   else if (post.user_id != req.account.id)
-    res.json({"error": "ownership"});
+    res.status(403).json({"status": 403, "message": "You do not have the right to delete this post."});
   else {
     for (const comment of db.prepare("SELECT * FROM comments WHERE post_id = ?").all(post.id)) {
       db.prepare("DELETE FROM replies WHERE comment_id = ?").run(comment.comment_id);
@@ -162,31 +162,32 @@ router.delete("/posts/:id", protect, function(req, res) {
     }
     db.prepare("DELETE FROM posts WHERE id = ?").run(post.id);
     db.prepare("DELETE FROM likes WHERE post_id = ?").run(post.id);
+    res.status(200).json({"status": 200});
   }
 });
 
 router.delete("/comment", protect, function(req, res) {
   const comment = db.prepare("SELECT * FROM comments WHERE comment_id = ?").get(req.body.comment_id);
   if (comment == undefined)
-    res.json({"error": "comment_id"});
+    res.status(404).json({"status": 404, "message": "Comment that you provided with the 'comment' paramater does not exist."});
   else if (comment.user_id != req.account.id)
-    res.json({"error": "ownership"});
+    res.status(403).json({"status": 403, "message": "You do not have the right to delete this comment."});
   else {
     db.prepare("DELETE FROM replies WHERE comment_id = ?").run(req.body.comment_id);
     db.prepare("DELETE FROM comments WHERE comment_id = ?").run(req.body.comment_id);
-    res.json({"status": "ok"});
+    res.status(200).json({"status": 200});
   }
 });
 
 router.delete("/reply", protect, function(req, res) {
   const reply = db.prepare("SELECT * FROM replies WHERE id = ?").get(req.body.reply_id);
   if (reply == undefined)
-    res.json({"error": "reply_id"});
+    res.status(400).json({"status": 400, "message": "You must provide a 'reply_id' paramater."});
   else if (reply.user_id != req.account.id)
-    res.json({"error": "ownership"});
+    res.status(403).json({"status": 403, "message": "You do not have the right to delete this reply."});
   else {
     db.prepare("DELETE FROM replies WHERE id = ?").run(req.body.reply_id);
-    res.json({"status": "ok"});
+    res.status(200).json({"status": 200});
   }
 });
 
@@ -246,12 +247,11 @@ router.get("/timeline", function(req, res) {
       date_created: post.date
     });
   }
-  res.json(response);
+  res.status(200).json(response);
 });
 
 module.exports = router;
 
-// better errors
 // improve accounts???/!?!? (including passwords that are hashed)
 // notifications
 
