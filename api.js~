@@ -38,7 +38,7 @@ router.get("/posts/:id", function(req, res) {
   for (var comment of db.prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY date").all(req.params.id)) {
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(comment.user_id);
     var replies = [];
-    for (var reply of db.prepare("SELECT * FROM replies WHERE comment_id = ? ORDER BY date DESC").all(comment.id)) {
+    for (var reply of db.prepare("SELECT * FROM replies WHERE comment_id = ? ORDER BY date DESC").all(comment.comment_id)) {
       const reply_user = db.prepare("SELECT * FROM users WHERE id = ?").get(reply.user_id);
       replies.push({
         id: reply.id,
@@ -51,7 +51,7 @@ router.get("/posts/:id", function(req, res) {
       });
     }
     comments.push({
-      id: comment.id,
+      id: comment.comment_id,
       user: {
         id: user.id,
         username: user.username
@@ -128,7 +128,7 @@ router.post("/posts/:id/comment", protect, function(req, res) {
   else if (req.body.comment == undefined)
     res.status(400).json({"status": 400, "message": "You must provide a 'comment' paramater."});
   else {
-    const id = db.prepare("SELECT MAX(id) FROM comments").get()["MAX(id)"] + 1;
+    const id = db.prepare("SELECT MAX(comment_id) FROM comments").get()["MAX(comment_id)"] + 1;
     db.prepare("INSERT INTO comments VALUES (?, ?, ?, ?, ?)").run(id, req.params.id, req.body.comment, req.account.id, moment().format());
     res.status(200).json({"status": 200});
   }
@@ -138,7 +138,7 @@ router.post("/posts/:id/reply", protect, function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
     res.status(404).json({"status": 404, "message": "Post does not exist."});
-  else if (db.prepare("SELECT * FROM comments WHERE id = ?").get(req.body.comment_id) == undefined)
+  else if (db.prepare("SELECT * FROM comments WHERE comment_id = ?").get(req.body.comment_id) == undefined)
     res.status(404).json({"status": 404, "message": "The comment provided from the 'comment_id' paramater does not exist."});
   else if (req.body.reply == undefined)
     res.status(400).json({"status": 400, "message": "You must provide a 'reply' paramater."});
@@ -157,8 +157,8 @@ router.delete("/posts/:id", protect, function(req, res) {
     res.status(403).json({"status": 403, "message": "You do not have the right to delete this post."});
   else {
     for (const comment of db.prepare("SELECT * FROM comments WHERE post_id = ?").all(post.id)) {
-      db.prepare("DELETE FROM replies WHERE comment_id = ?").run(comment.id);
-      db.prepare("DELETE FROM comments WHERE id = ?").run(comment.id);
+      db.prepare("DELETE FROM replies WHERE comment_id = ?").run(comment.comment_id);
+      db.prepare("DELETE FROM comments WHERE comment_id = ?").run(comment.comment_id);
     }
     db.prepare("DELETE FROM posts WHERE id = ?").run(post.id);
     db.prepare("DELETE FROM likes WHERE post_id = ?").run(post.id);
@@ -167,14 +167,14 @@ router.delete("/posts/:id", protect, function(req, res) {
 });
 
 router.delete("/comment", protect, function(req, res) {
-  const comment = db.prepare("SELECT * FROM comments WHERE id = ?").get(req.body.comment_id);
+  const comment = db.prepare("SELECT * FROM comments WHERE comment_id = ?").get(req.body.comment_id);
   if (comment == undefined)
     res.status(404).json({"status": 404, "message": "Comment that you provided with the 'comment' paramater does not exist."});
   else if (comment.user_id != req.account.id)
     res.status(403).json({"status": 403, "message": "You do not have the right to delete this comment."});
   else {
     db.prepare("DELETE FROM replies WHERE comment_id = ?").run(req.body.comment_id);
-    db.prepare("DELETE FROM comments WHERE id = ?").run(req.body.comment_id);
+    db.prepare("DELETE FROM comments WHERE comment_id = ?").run(req.body.comment_id);
     res.status(200).json({"status": 200});
   }
 });
@@ -200,7 +200,7 @@ router.get("/timeline", function(req, res) {
     for (var comment of db.prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY date").all(post.id)) {
       const user = db.prepare("SELECT * FROM users WHERE id = ?").get(comment.user_id);
       var replies = [];
-      for (var reply of db.prepare("SELECT * FROM replies WHERE comment_id = ? ORDER BY date DESC").all(comment.id)) {
+      for (var reply of db.prepare("SELECT * FROM replies WHERE comment_id = ? ORDER BY date DESC").all(comment.comment_id)) {
         const reply_user = db.prepare("SELECT * FROM users WHERE id = ?").get(reply.user_id);
         replies.push({
           id: reply.id,
@@ -213,7 +213,7 @@ router.get("/timeline", function(req, res) {
         });
       }
       comments.push({
-        id: comment.id,
+        id: comment.comment_id,
         user: {
           id: user.id,
           username: user.username
@@ -257,3 +257,7 @@ module.exports = router;
 // notifications
 
 // random ids???
+
+// CREATE TABLE posts (id INT, title CHAR(10), content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE users(id INT, username CHAR(10), password CHAR(16)); CREATE TABLE likes (post_id INT, user_id INT); CREATE TABLE comments (comment_id INT, post_id INT, content CHAR(3000), user_id INT, date CHAR(16)); CREATE TABLE replies (id INT, comment_id INT, content CHAR(500), user_id INT, date CHAR(30)); 
+
+// INSERT INTO users VALUES ('1', 'admin', 'password'); INSERT INTO users VALUES ('2', 'mooshoe', 'moocowspassword'); INSERT INTO posts VALUES ('1000000', 'First post!', '{content}', '1', '2018-12-09T17:09:47+00:00'); INSERT INTO likes VALUES ('1000000', '1'); INSERT INTO comments VALUES ('1', '1000000', '{comment}', '1', '2018-12-14T00:17:46+00:00'); INSERT INTO replies VALUES ('1', '1', '{reply}', '2', '2018-12-15T19:26:41+00:00');

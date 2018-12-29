@@ -4,21 +4,17 @@
   "description": "i have no fucking idea what this is",
   "main": "server.js",
   "scripts": {
-    "production": "NODE_ENV=production node server.js",
-    "dev": "nodemon server.js",
-    "env-setup": "scripty"
+    "start": "node server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^5.0.1",
-    "body-parser": "^1.18.3",
-    "dotenv": "^6.2.0",
     "express": "^4.16.4",
+    "body-parser": "^1.18.3",
     "jsonwebtoken": "^8.4.0",
-    "moment": "^2.22.2"
+    "moment": "^2.22.2",
+    "better-sqlite3": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^1.18.9",
-    "scripty": "^1.9.0"
+    "nodemon": "^1.18.9"
   },
   "engines": {
     "node": "8.x"
