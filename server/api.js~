@@ -1,6 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const Database = require('better-sqlite3')
+const Database = require('better-sqlite3');
+const bcrypt = require('bcrypt');
 const moment = require('moment');
 var router = express.Router();
 
@@ -21,7 +22,7 @@ router.post("/token", function(req, res) {
   const account = db.prepare("SELECT * FROM users WHERE username = ?").get(req.body.username);
   if (account == undefined) {
     res.status(400).json({"status": 400, "message": "You have not supplied a user that exist."});
-  } else if (req.body.password != account.password) {
+  } else if (!bcrypt.compareSync(req.body.password, account.password)) {
     res.status(400).json({"status": 400, "message": "You have the incorrect password for your user."});
   } else {
     res.status(200).json({"token": jwt.sign({ id: account.id }, process.env.SECRET)});
@@ -252,8 +253,7 @@ router.get("/timeline", function(req, res) {
 
 module.exports = router;
 
-// better set up, should create tables if file doesnt exist.
-// improve accounts???/!?!? (including passwords that are hashed)
+// improve accounts???/!?!?
 // notifications
 
 // random ids???

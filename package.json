@@ -9,6 +9,7 @@
     "env-setup": "scripty"
   },
   "dependencies": {
+    "bcrypt": "^3.0.3",
     "better-sqlite3": "^5.0.1",
     "body-parser": "^1.18.3",
     "dotenv": "^6.2.0",
