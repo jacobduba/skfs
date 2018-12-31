@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const Database = require('better-sqlite3');
 const moment = require('moment');
+const bcrypt = require('bcrypt');
 const fs = require('fs');
 const app = express();
 
@@ -13,33 +14,39 @@ if (!fs.existsSync('.data/database.db')) {
 
   // Tables
   db.prepare("CREATE TABLE posts (id INT, title CHAR(10), content CHAR(3000), user_id INT, date CHAR(16))").run();
-  db.prepare("CREATE TABLE users(id INT, username CHAR(10), password CHAR(16))").run();
+  db.prepare("CREATE TABLE users (id INT, username CHAR(10), password CHAR(16), bio CHAR(300), date CHAR(16))").run();
   db.prepare("CREATE TABLE likes (post_id INT, user_id INT)").run();
   db.prepare("CREATE TABLE comments (id INT, post_id INT, content CHAR(3000), user_id INT, date CHAR(16))").run();
   db.prepare("CREATE TABLE replies (id INT, comment_id INT, content CHAR(500), user_id INT, date CHAR(30))").run();
+  db.prepare("CREATE TABLE history (user_id INT, action CHAR(300), date CHAR(16))").run();
 
   // Default Entries
-  db.prepare("INSERT INTO users VALUES ('1', 'admin', 'password')").run();
+  db.prepare("INSERT INTO users VALUES ('1', 'admin', ?, '', ?)").run(bcrypt.hashSync('password', 10), moment().format());
   db.prepare("INSERT INTO posts VALUES ('1000000', 'First post!', '{content}', '1', ?)").run(moment().format());
+  db.prepare("INSERT INTO history VALUES ('1', ?, ?)").run(JSON.stringify({type:'post',post_id:1000000,title:'First post!'}), moment().format())
   db.prepare("INSERT INTO likes VALUES ('1000000', '1')").run();
+  // liking you own post doesnt show here   db.prepare("INSERT INTO history VALUES ('1', ?, ?)").run(JSON.stringify({type: 'like',post_id:1000000,post_title:"First Post!"}));
   db.prepare("INSERT INTO comments VALUES ('1', '1000000', '{comment}', '1', ?)").run(moment().format());
+  db.prepare("INSERT INTO history VALUES ('1', ?, ?)").run(JSON.stringify({type:'comment',post_id:1000000,comment_id:1,post_title:'First Post!'}), moment().add(2, 's').format())
   db.prepare("INSERT INTO replies VALUES ('1', '1', '{reply}', '2', ?);").run(moment().format());
+  db.prepare("INSERT INTO history VALUES ('1', ?, ?)").run(JSON.stringify({type:'reply',post_id:1000000,reply_id:1, post_title:'First Post!'}), moment().add(3, 's').format());
 
   // More entries for delevopers to play around with
+  // this section has no history. deal with it.
   if (process.env.NODE_ENV !== 'production') {
-    db.prepare("INSERT INTO users VALUES ('2', 'developer', 'password')").run();
+    db.prepare("INSERT INTO users VALUES ('2', 'developer', ?, 'devguy', ?)").run(bcrypt.hashSync('password', 10), moment().format());
     db.prepare("INSERT INTO posts VALUES ('1000001', 'Here is another post!', '{more content}', '2', ?)").run(moment().add(1, 's').format());
     db.prepare("INSERT INTO likes VALUES ('1000001', '2')").run();
     db.prepare("INSERT INTO likes VALUES ('1000000', '2')").run();
-    db.prepare("INSERT INTO comments VALUES ('2', '1000002', '{a second comment}', '1', ?)").run(moment().add(1, 's').format());
-    db.prepare("INSERT INTO comments VALUES ('3', '1000003', '{a third comment}', '2', ?)").run(moment().add(2, 's').format());
+    db.prepare("INSERT INTO comments VALUES ('2', '1000001', '{a second comment}', '1', ?)").run(moment().add(1, 's').format());
+    db.prepare("INSERT INTO comments VALUES ('3', '1000001', '{a third comment}', '2', ?)").run(moment().add(2, 's').format());
     db.prepare("INSERT INTO replies VALUES ('2', '1', '{here is another reply}', '1', ?);").run(moment().add(1, 's').format());
     db.prepare("INSERT INTO replies VALUES ('3', '2', '{third reply, just for you!}', '2', ?);").run(moment().add(2, 's').format());
   }
 }
 
-const api = require("./api.js");
-app.use(express.static('public'));
+const api = require("./server/api.js");
+app.use(express.static('./server/public'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api/v1", api);

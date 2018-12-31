@@ -3,9 +3,10 @@ const jwt = require('jsonwebtoken');
 const Database = require('better-sqlite3');
 const bcrypt = require('bcrypt');
 const moment = require('moment');
+const fs = require('fs');
 var router = express.Router();
 
-var db = new Database('.data/database.db');
+var db = new Database('./.data/database.db');
 
 // middleware
 function protect(req, res, next) {
@@ -17,7 +18,17 @@ function protect(req, res, next) {
   }
 }
 
+// helpers
+function getAvatarUrl(user) {
+  if (fs.existsSync(__dirname + "/public/images/avatars/" + user.id + ".png")) {
+    return process.env.URL + "/images/avatars/" + user.id + ".png";
+  } else {
+    return process.env.URL + "/images/avatars/default.png";
+  }
+}
+
 // routes
+// note to self that the plans are to replace this to make using the website mandatory and add control over with apps get to use it.
 router.post("/token", function(req, res) {
   const account = db.prepare("SELECT * FROM users WHERE username = ?").get(req.body.username);
   if (account == undefined) {
@@ -45,7 +56,10 @@ router.get("/posts/:id", function(req, res) {
         id: reply.id,
         user: {
           id: reply_user.id,
-          username: reply_user.username
+          username: reply_user.username,
+          bio: reply_user.bio,
+          avatar: getAvatarUrl(reply_user),
+          date_created: reply_user.date
         },
         reply: reply.content,
         date_created: reply.date
@@ -55,7 +69,10 @@ router.get("/posts/:id", function(req, res) {
       id: comment.id,
       user: {
         id: user.id,
-        username: user.username
+        username: user.username,
+        bio: user.bio,
+        avatar: getAvatarUrl(user),
+        date_created: user.date
       },
       post_id: comment.post_id,
       comment: comment.content,
@@ -69,7 +86,10 @@ router.get("/posts/:id", function(req, res) {
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(user_liked.user_id);
     liked.push({
       id: user.id,
-      username: user.username
+      username: user.username,
+      bio: user.bio,
+      avatar: getAvatarUrl(user),
+      date_created: user.date
     });
   }
 
@@ -77,7 +97,10 @@ router.get("/posts/:id", function(req, res) {
     id: post.id,
     user: {
       id: user.id,
-      username: user.username
+      username: user.username,
+      bio: user.bio,
+      avatar: getAvatarUrl(user),
+      date_created: user.date
     }, 
     title: post.title,
     content: post.content,
@@ -95,6 +118,9 @@ router.post("/post", protect, function(req, res) {
   const id = db.prepare("SELECT MAX(id) FROM posts").get()["MAX(id)"] + 1;
   db.prepare("INSERT INTO posts VALUES (?, ?, ?, ?, ?)").run(id, req.body.title, req.body.content, req.account.id, moment().format());
   db.prepare("INSERT INTO likes VALUES (?, ?)").run(id, req.account.id);
+  // TODO
+  db.prepare("INSERT INTO history VALUES (?, ?, ?)").run(req.account.id, JSON.stringify({type:'post', post_id: id, title: req.body.title}), moment().format());
+  // TODO
   res.status(200).json({"status": 200});
 });
 
@@ -192,6 +218,26 @@ router.delete("/reply", protect, function(req, res) {
   }
 });
 
+router.get("/users/:id", function(req, res) {
+  const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.params.id);
+  if (user == undefined)
+    res.status(404).json({"status": 404, "message": "This user does not exist."});
+  var history = [];
+  for (const part of db.prepare("SELECT * FROM history WHERE user_id = ? ORDER BY date DESC LIMIT 50").all(req.params.id)) {
+    var action = JSON.parse(part.action);
+    action.date = part.date;
+    history.push(action);
+  }
+  res.status(200).json({
+    id: user.id,
+    username: user.username,
+    bio: user.bio,
+    avatar: getAvatarUrl(user),
+    history: history,
+    date_created: user.date
+  })
+});
+
 router.get("/timeline", function(req, res) {
   var response = [];
   for (const post of db.prepare("SELECT * FROM posts ORDER BY date DESC LIMIT 20").all()) {
@@ -207,7 +253,10 @@ router.get("/timeline", function(req, res) {
           id: reply.id,
           user: {
             id: reply_user.id,
-            username: reply_user.username
+            username: reply_user.username,
+            bio: reply_user.bio,
+            avatar: getAvatarUrl(reply_user),
+            date_created: reply_user.date
           },
           comment: reply.content,
           date_created: reply.date
@@ -217,7 +266,10 @@ router.get("/timeline", function(req, res) {
         id: comment.id,
         user: {
           id: user.id,
-          username: user.username
+          username: user.username,
+          bio: user.bio,
+          avatar: getAvatarUrl(user),
+          date_created: user.date
         },
         post_id: comment.post_id,
         comment: comment.content,
@@ -231,7 +283,10 @@ router.get("/timeline", function(req, res) {
       const user_here = db.prepare("SELECT * FROM users WHERE id = ?").get(user_liked.user_id);
       liked.push({
         id: user_here.id,
-        username: user_here.username
+        username: user_here.username,
+        bio: user_here.bio,
+        avatar: getAvatarUrl(user_here),
+        date_created: user_here.date
       });
     }
 
@@ -239,7 +294,10 @@ router.get("/timeline", function(req, res) {
       id: post.id,
       user: {
         id: user.id,
-        username: user.username
+        username: user.username,
+        bio: user.bio,
+        avatar: getAvatarUrl(user),
+        date_created: user.date
       },
       title: post.title,
       content: post.content,
@@ -253,7 +311,7 @@ router.get("/timeline", function(req, res) {
 
 module.exports = router;
 
-// improve accounts???/!?!?
+// finish history
 // notifications
 
 // random ids???

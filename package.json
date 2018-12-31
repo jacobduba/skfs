@@ -1,6 +1,6 @@
 {
   "name": "skfs",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "i have no fucking idea what this is",
   "main": "server.js",
   "scripts": {
