@@ -23,10 +23,10 @@ This is the REST API for skfs, which can be used to access the site to create bo
 * [Comment](#comment)
 * [Reply](#reply)
 * [History](#history)
-  * [history (type: 'post')](#history-type-post)
-  * [history (type: 'like')](#history-type-like)
-  * [history (type: 'comment')](#history-type-comment)
-  * [history (type: 'reply')](#history-type-reply)
+  * [history (type: 'POST')](#history-type-post)
+  * [history (type: 'LIKE')](#history-type-like)
+  * [history (type: 'COMMENT')](#history-type-comment)
+  * [history (type: 'REPLY')](#history-type-reply)
 
 ### POST /api/v1/token
 
@@ -238,79 +238,80 @@ Returns [User.](#user)
 Entities in the skfs api. All dates are in ISO 8601 format.
 
 ### Token
-| Attribute | Type | Nullable | Added in |
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `token` | String | ❌ | 0.0.0 |
+| `token` | String | 0.0.0 |
 
 ### User
-| Attribute | Type | Nullable | Added in |
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `id` | int | ❌ | 0.0.0 |
-| `username` | String | ❌ | 0.0.0 |
-| `bio` | String | ❌ | 0.0.1 |
-| `avatar` | String | ❌ | 0.0.1 |
-| `history` |  Array of [History](#history) | ✅ | 0.0.1 |
-| `date_created` | String | ❌ | 0.0.1 |
+| `id` | int | 0.0.0 |
+| `username` | String | 0.0.0 |
+| `bio` | String | 0.0.1 |
+| `avatar` | String | 0.0.1 |
+| `history` |  Array of [History](#history) | 0.0.1 |
+| `date_created` | String | 0.0.1 |
 
 ### Post
-| Attribute | Type | Nullable | Added in |
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `id` | int | ❌ | 0.0.0 |
-| `title` | String | ❌ | 0.0.0 |
-| `user` | [User](#user) | ❌ | 0.0.0 |
-| `content` | String | ❌ | 0.0.0 |
-| `likes` | Array of [User](#user) | ❌ | 0.0.0 |
-| `comments` | Array of [Comment](#comment) | ❌ | 0.0.0 |
-| `date_created` | String | ❌ | 0.0.0 |
+| `id` | int | 0.0.0 |
+| `title` | String | 0.0.0 |
+| `user` | [User](#user) | 0.0.0 |
+| `content` | String | 0.0.0 |
+| `likes` | Array of [User](#user) | 0.0.0 |
+| `comments` | Array of [Comment](#comment) | 0.0.0 |
+| `date_created` | String | 0.0.0 |
 
 ### Comment
-| Attribute | Type | Nullable | Added in |
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `id` | int | ❌ | 0.0.0 |
-| `user` | [User](#user) | ❌ | 0.0.0 |
-| `post_id` | int | ❌ | 0.0.0 |
-| `comment` | String | ❌ | 0.0.0 |
+| `id` | int | 0.0.0 |
+| `user` | [User](#user) | 0.0.0 |
+| `post_id` | int | 0.0.0 |
+| `comment` | String | 0.0.0 |
 | `replies` | Array of [Reply](#reply) | 0.0.0 |
-| `date_created` | String | ❌ | 0.0.0 |
+| `date_created` | String | 0.0.0 |
 
 ### Reply
-| Attribute | Type | Nullable | Added in |
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `id` | int | ❌ | 0.0.0 |
-| `user` | [User](#user) | ❌ | 0.0.0 |
-| `reply` | String | ❌ | 0.0.0 |
-| `date_created` | String | ❌ | 0.0.0 |
+| `id` | int | 0.0.0 |
+| `user` | [User](#user) | 0.0.0 |
+| `reply` | String | 0.0.0 |
+| `date_created` | String | 0.0.0 |
 
 ### History
 
 Different types of actions have different contents in their history. There are just enough fields in each one to display the history of each user in an attractive way.
 
-### History (type: 'post')
-| Attribute | Type | Nullable | Added in |
+### History (type: 'POST')
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `type` | String | ❌ | 0.0.1 |
-| `post_id` | int | ✅ | 0.0.1 |
-| `title` | String | ✅ | 0.0.1 |
+| `type` | String | 0.0.1 |
+| `post_id` | int | 0.0.1 |
+| `date` | String | 0.0.1 |
 
-### History (type: 'like')
-| Attribute | Type | Nullable | Added in |
+### History (type: 'LIKE')
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `type` | String | ❌ | 0.0.1 |
-| `post_id` | int | ✅ | 0.0.1 |
-| `post_title` | String | ✅ | 0.0.1 |
+| `type` | String | 0.0.1 |
+| `post_id` | int | 0.0.1 |
+| `date` | String | 0.0.1 |
 
-### History (type: 'comment')
-| Attribute | Type | Nullable | Added in |
+### History (type: 'COMMENT')
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `type` | String | ❌ | 0.0.1 |
-| `post_id` | int | ✅ | 0.0.1 |
-| `comment_id` | int | ✅ | 0.0.1 |
-| `post_title` |  String | ✅ | 0.0.1 |
+| `type` | String | 0.0.1 |
+| `post_id` | int | 0.0.1 |
+| `comment_id` | int | 0.0.1 |
+| `date` |  String | 0.0.1 |
 
-### History (type: 'reply')
-| Attribute | Type | Nullable | Added in |
+### History (type: 'REPLY')
+| Attribute | Type | Added in |
 | - | - | - | - |
-| `type` | String | ❌ | 0.0.1 |
-| `post_id` | int | ✅ | 0.0.1 |
-| `reply_id` | int | ✅ | 0.0.1 |
-| `post_id` | String | ✅ | 0.0.1 |
+| `type` | String | 0.0.1 |
+| `post_id` | int | 0.0.1 |
+| `comment_id` | int | 0.0.1 |
+| `reply_id` | int | 0.0.1 |
+| `date` | String | 0.0.1 |

@@ -116,11 +116,8 @@ router.post("/post", protect, function(req, res) {
   else if (req.body.content == undefined)
     res.status(400).json({"status": 400, "message": "You must suply the content param."});
   const id = db.prepare("SELECT MAX(id) FROM posts").get()["MAX(id)"] + 1;
-  db.prepare("INSERT INTO posts VALUES (?, ?, ?, ?, ?)").run(id, req.body.title, req.body.content, req.account.id, moment().format());
+  db.prepare("INSERT INTO posts VALUES ( ?, ?, ?, ?, ?)").run(id, req.body.title, req.body.content, req.account.id, moment().format());
   db.prepare("INSERT INTO likes VALUES (?, ?)").run(id, req.account.id);
-  // TODO
-  db.prepare("INSERT INTO history VALUES (?, ?, ?)").run(req.account.id, JSON.stringify({type:'post', post_id: id, title: req.body.title}), moment().format());
-  // TODO
   res.status(200).json({"status": 200});
 });
 
@@ -132,7 +129,7 @@ router.post("/posts/:id/like", protect, function(req, res) {
   if (likes != undefined) {
     res.status(400).json({"status": 400, "message": "Already liked the post."});
   } else {
-    db.prepare("INSERT INTO likes VALUES (?, ?)").run(req.params.id, req.account.id);
+    db.prepare("INSERT INTO likes VALUES ( ?, ?, ?)").run(req.params.id, req.account.id, moment().format());
     res.status(200).json({"status": 200});
   }
 });
@@ -156,7 +153,7 @@ router.post("/posts/:id/comment", protect, function(req, res) {
     res.status(400).json({"status": 400, "message": "You must provide a 'comment' paramater."});
   else {
     const id = db.prepare("SELECT MAX(id) FROM comments").get()["MAX(id)"] + 1;
-    db.prepare("INSERT INTO comments VALUES (?, ?, ?, ?, ?)").run(id, req.params.id, req.body.comment, req.account.id, moment().format());
+    db.prepare("INSERT INTO comments VALUES ( ?, ?, ?, ?, ?)").run(id, req.params.id, req.body.comment, req.account.id, moment().format());
     res.status(200).json({"status": 200});
   }
 });
@@ -171,7 +168,7 @@ router.post("/posts/:id/reply", protect, function(req, res) {
     res.status(400).json({"status": 400, "message": "You must provide a 'reply' paramater."});
   else {
     const id = db.prepare("SELECT MAX(id) FROM replies").get()["MAX(id)"] + 1;
-    db.prepare("INSERT INTO replies VALUES (?, ?, ?, ?, ?)").run(id, req.body.comment_id, req.body.reply, req.account.id, moment().format());
+    db.prepare("INSERT INTO replies VALUES ( ?, ?, ?, ?, ?)").run(id, req.body.comment_id, req.body.reply, req.account.id, moment().format());
     res.status(200).json({"status": 200});
   }
 });
@@ -222,12 +219,44 @@ router.get("/users/:id", function(req, res) {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(req.params.id);
   if (user == undefined)
     res.status(404).json({"status": 404, "message": "This user does not exist."});
-  var history = [];
-  for (const part of db.prepare("SELECT * FROM history WHERE user_id = ? ORDER BY date DESC LIMIT 50").all(req.params.id)) {
-    var action = JSON.parse(part.action);
-    action.date = part.date;
-    history.push(action);
-  }
+
+  var history = [
+    ...db.prepare("SELECT * FROM posts WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+      return {
+        type: 'POST',
+        post_id: obj.id,
+        date: obj.date
+      };
+    }),
+    ...db.prepare("SELECT * FROM likes WHERE user_id = ? ORDER BY date DESC LIMIT 20"). all(req.params.id).map(obj => {
+      return {
+        type: 'LIKE',
+        post_id: obj.post_id,
+        date: obj.date
+      };
+    }),
+    ...db.prepare("SELECT * FROM comments WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+      return {
+        type: 'COMMENT',
+        post_id: obj.post_id,
+        comment_id: obj.id,
+        date: obj.date
+      };
+    }),
+    ...db.prepare("SELECT * FROM replies WHERE user_id = ? ORDER BY date DESC LIMIT 20").all(req.params.id).map(obj => {
+      const comment = db.prepare("SELECT * FROM comments WHERE id = ?").get(obj.comment_id);
+      return {
+        type: 'REPLY',
+        post_id: comment.post_id,
+        comment_id: obj.comment_id,
+        reply_id: obj.id,
+        date: obj.date
+      };
+    })
+  ].sort(function(a, b) {
+    return b.date.localeCompare(a.date);
+  }).splice(0, 20);
+
   res.status(200).json({
     id: user.id,
     username: user.username,
@@ -306,12 +335,11 @@ router.get("/timeline", function(req, res) {
       date_created: post.date
     });
   }
-  res.status(200).json(response);
+  res.status(200).json  (response);
 });
 
 module.exports = router;
 
-// finish history
 // notifications
 
-// random ids???
+// future for api: random ids for some things?
