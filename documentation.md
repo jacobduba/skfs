@@ -239,12 +239,12 @@ Entities in the skfs api. All dates are in ISO 8601 format.
 
 ### Token
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `token` | String | 0.0.0 |
 
 ### User
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `id` | int | 0.0.0 |
 | `username` | String | 0.0.0 |
 | `bio` | String | 0.0.1 |
@@ -254,7 +254,7 @@ Entities in the skfs api. All dates are in ISO 8601 format.
 
 ### Post
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `id` | int | 0.0.0 |
 | `title` | String | 0.0.0 |
 | `user` | [User](#user) | 0.0.0 |
@@ -265,7 +265,7 @@ Entities in the skfs api. All dates are in ISO 8601 format.
 
 ### Comment
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `id` | int | 0.0.0 |
 | `user` | [User](#user) | 0.0.0 |
 | `post_id` | int | 0.0.0 |
@@ -275,7 +275,7 @@ Entities in the skfs api. All dates are in ISO 8601 format.
 
 ### Reply
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `id` | int | 0.0.0 |
 | `user` | [User](#user) | 0.0.0 |
 | `reply` | String | 0.0.0 |
@@ -287,21 +287,21 @@ Different types of actions have different contents in their history. There are j
 
 ### History (type: 'POST')
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `type` | String | 0.0.1 |
 | `post_id` | int | 0.0.1 |
 | `date` | String | 0.0.1 |
 
 ### History (type: 'LIKE')
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `type` | String | 0.0.1 |
 | `post_id` | int | 0.0.1 |
 | `date` | String | 0.0.1 |
 
 ### History (type: 'COMMENT')
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `type` | String | 0.0.1 |
 | `post_id` | int | 0.0.1 |
 | `comment_id` | int | 0.0.1 |
@@ -309,7 +309,7 @@ Different types of actions have different contents in their history. There are j
 
 ### History (type: 'REPLY')
 | Attribute | Type | Added in |
-| - | - | - | - |
+| - | - | - |
 | `type` | String | 0.0.1 |
 | `post_id` | int | 0.0.1 |
 | `comment_id` | int | 0.0.1 |
