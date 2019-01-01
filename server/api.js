@@ -335,7 +335,7 @@ router.get("/timeline", function(req, res) {
       date_created: post.date
     });
   }
-  res.status(200).json  (response);
+  res.status(200).json(response);
 });
 
 module.exports = router;
