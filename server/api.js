@@ -341,5 +341,6 @@ router.get("/timeline", function(req, res) {
 module.exports = router;
 
 // notifications
+// get list of all users
 
 // future for api: random ids for some things?
