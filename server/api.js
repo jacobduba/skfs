@@ -342,5 +342,7 @@ module.exports = router;
 
 // notifications
 // get list of all users
+// get instance's quick links
+// MAKE ALL TIME UTC
 
 // future for api: random ids for some things?

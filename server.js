@@ -16,7 +16,7 @@ if (!fs.existsSync('.data/database.db')) {
   console.log("No previous database found, creating new database in the .data folder.");
 
   // Tables
-  db.prepare("CREATE TABLE posts (id INT, title CHAR(10), content CHAR(3000), user_id INT, date CHAR(16))").run();
+  db.prepare("CREATE TABLE posts (id INT, title CHAR(50), content CHAR(3000), user_id INT, date CHAR(16))").run();
   db.prepare("CREATE TABLE users (id INT, username CHAR(10), password CHAR(16), bio CHAR(300), date CHAR(16))").run();
   db.prepare("CREATE TABLE likes (post_id INT, user_id INT, date CHAR(16))").run();
   db.prepare("CREATE TABLE comments (id INT, post_id INT, content CHAR(3000), user_id INT, date CHAR(16))").run();
