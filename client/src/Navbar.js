@@ -1,4 +1,5 @@
 import React from 'react';
+import { Router, Route, Link } from 'react-router-dom';
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -23,9 +24,9 @@ class Navbar extends React.Component {
       <div>
         <nav className="navbar bottom" role="navigation">
           <div className="navbar-brand">
-            <a className="navbar-item" href="/">
+            <div className="navbar-item">
               <p>{this.state.instanceName}</p>
-            </a>
+            </div>
 
             <a role="button" className={this.state.isActive ? "navbar-burger burger is-active" : "navbar-burger burger"} onClick={() => this.changeActive()}>
               <span></span>
@@ -48,7 +49,7 @@ class Navbar extends React.Component {
         </nav>
         <nav className="custom-navbar" role="navigation">
           <ul>
-            <li><a href="/">INSTANCE FIREHOSE</a></li><li><a href="/about">ABOUT THIS INSTANCE</a></li><li className="seperator">|</li>
+            <li><Link to="/">INSTANCE FIREHOSE</Link></li><li><Link to="/about">ABOUT THIS INSTANCE</Link></li><li className="seperator">|</li>
             {this.state.links.map(link =>
                 <li><a href={link.url} target="_blank">{link.name.toUpperCase()}</a></li>
             )}

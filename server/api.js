@@ -19,13 +19,6 @@ function protect(req, res, next) {
 }
 
 // helpers
-function getAvatarUrl(user) {
-  if (fs.existsSync(__dirname + "/public/images/avatars/" + user.id + ".png")) {
-    return process.env.URL + "/images/avatars/" + user.id + ".png";
-  } else {
-    return process.env.URL + "/images/avatars/default.png";
-  }
-}
 
 // routes
 // note to self that the plans are to replace this to make using the website mandatory and add control over with apps get to use it.
@@ -47,7 +40,7 @@ router.get("/posts/:id", function(req, res) {
   const user = db.prepare("SELECT * FROM users WHERE id = ?").get(post.user_id);
 
   var comments = [];
-  for (var comment of db.prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY date").all(req.params.id)) {
+  for (var comment of db.prepare("SELECT * FROM comments WHERE post_id = ? ORDER BY date DESC").all(req.params.id)) {
     const user = db.prepare("SELECT * FROM users WHERE id = ?").get(comment.user_id);
     var replies = [];
     for (var reply of db.prepare("SELECT * FROM replies WHERE comment_id = ? ORDER BY date DESC").all(comment.id)) {
@@ -58,7 +51,6 @@ router.get("/posts/:id", function(req, res) {
           id: reply_user.id,
           username: reply_user.username,
           bio: reply_user.bio,
-          avatar: getAvatarUrl(reply_user),
           date_created: reply_user.date
         },
         reply: reply.content,
@@ -71,7 +63,6 @@ router.get("/posts/:id", function(req, res) {
         id: user.id,
         username: user.username,
         bio: user.bio,
-        avatar: getAvatarUrl(user),
         date_created: user.date
       },
       post_id: comment.post_id,
@@ -88,7 +79,6 @@ router.get("/posts/:id", function(req, res) {
       id: user.id,
       username: user.username,
       bio: user.bio,
-      avatar: getAvatarUrl(user),
       date_created: user.date
     });
   }
@@ -99,7 +89,6 @@ router.get("/posts/:id", function(req, res) {
       id: user.id,
       username: user.username,
       bio: user.bio,
-      avatar: getAvatarUrl(user),
       date_created: user.date
     }, 
     title: post.title,
@@ -117,7 +106,7 @@ router.post("/post", protect, function(req, res) {
     res.status(400).json({"status": 400, "message": "You must suply the content param."});
   const id = db.prepare("SELECT MAX(id) FROM posts").get()["MAX(id)"] + 1;
   db.prepare("INSERT INTO posts VALUES ( ?, ?, ?, ?, ?)").run(id, req.body.title, req.body.content, req.account.id, moment().format());
-  db.prepare("INSERT INTO likes VALUES (?, ?)").run(id, req.account.id);
+  db.prepare("INSERT INTO likes VALUES (?, ?, ?)").run(id, req.account.id, moment().format());
   res.status(200).json({"status": 200});
 });
 
@@ -261,7 +250,6 @@ router.get("/users/:id", function(req, res) {
     id: user.id,
     username: user.username,
     bio: user.bio,
-    avatar: getAvatarUrl(user),
     history: history,
     date_created: user.date
   })
@@ -284,7 +272,6 @@ router.get("/timeline", function(req, res) {
             id: reply_user.id,
             username: reply_user.username,
             bio: reply_user.bio,
-            avatar: getAvatarUrl(reply_user),
             date_created: reply_user.date
           },
           comment: reply.content,
@@ -297,7 +284,6 @@ router.get("/timeline", function(req, res) {
           id: user.id,
           username: user.username,
           bio: user.bio,
-          avatar: getAvatarUrl(user),
           date_created: user.date
         },
         post_id: comment.post_id,
@@ -314,7 +300,6 @@ router.get("/timeline", function(req, res) {
         id: user_here.id,
         username: user_here.username,
         bio: user_here.bio,
-        avatar: getAvatarUrl(user_here),
         date_created: user_here.date
       });
     }
@@ -325,7 +310,6 @@ router.get("/timeline", function(req, res) {
         id: user.id,
         username: user.username,
         bio: user.bio,
-        avatar: getAvatarUrl(user),
         date_created: user.date
       },
       title: post.title,
@@ -343,6 +327,5 @@ module.exports = router;
 // notifications
 // get list of all users
 // get instance's quick links
-// MAKE ALL TIME UTC
 
 // future for api: random ids for some things?

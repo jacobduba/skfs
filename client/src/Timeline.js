@@ -1,5 +1,7 @@
 import React from 'react';
 import Moment from 'react-moment';
+import User from './User.js';
+import { BrowserRouter, Route, Link} from 'react-router-dom';
 
 class Timeline extends React.Component {
   constructor(props) {
@@ -19,7 +21,7 @@ class Timeline extends React.Component {
 
   render() {
     return(
-      <div className="main-timeline">
+      <div className="good-container">
           {this.state.timeline.map(post =>
           <article className="media">
             <figure className="media-left">
@@ -31,15 +33,15 @@ class Timeline extends React.Component {
             <div className="media-content">
                 <div className="content">
                   <p>
-                  <a href={"/posts/" + post.id}>
+                  <Link to={"/posts/" + post.id}>
                   <span className="media-title has-text-dark">{post.title}</span>
-                  <span className="media-details has-text-grey-light">Posted by <a href={"/users/@" + post.user.username}>@{post.user.username}</a> <Moment fromNow>{post.date_created}</Moment></span>
-                  </a>
+                  <span className="media-details has-text-grey-light">Posted by <User user={post.user} /> <Moment fromNow>{post.date_created}</Moment></span>
+                  </Link>
                   </p>
                   <div className="media-options">
                     <ul>
                       <li>{post.comments.length} COMMENT{(post.comments.length === 1) ? '' : 'S'}</li>
-                      <li>COPY</li>
+                      <li>LIKED BY</li>
                       <li>SHARE</li>
                     </ul>
                   </div>
