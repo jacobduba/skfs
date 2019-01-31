@@ -8,8 +8,8 @@ class Navbar extends React.Component {
     this.state = {
       isActive: false,
       // custsomizable stuff in the future
-      instanceName: this.props.name,
-      links: this.props.links
+      instanceName: "skfs",
+      links: [],
     };
   }
 
@@ -17,6 +17,56 @@ class Navbar extends React.Component {
     this.setState({
       isActive: !this.state.isActive
     })
+  }
+
+  componentDidMount() {
+    fetch("/api/v1/information")
+      .then(res => res.json())
+      .then(res => {
+        this.setState({
+          instanceName: res.instanceName,
+          links: res.links
+        })
+      });
+  }
+
+  populateNavbar() {
+    if (this.props.user == undefined) {
+      return (
+        <div className="navbar-item">
+          <div className="buttons">
+            <a className="button is-primary is-outlined is-inverted" href="/login">
+              Login / Sign up
+            </a>
+          </div>
+        </div>
+      )
+    } else {
+      return (
+        <div className="navbar-end">
+          <a className="navbar-item">
+            <span className="underline">create a post</span>
+          </a>
+          <div className="navbar-item has-dropdown is-hoverable">
+            <Link className="navbar-link is-arrowless underline" to="#">
+              logged in as @{this.props.user.username}
+            </Link>
+            <div className="navbar-dropdown">
+              <Link className="navbar-item has-text-grey-darker underline" to={"/users/@" + this.props.user.username}>
+                 Your Profile
+              </Link>
+              <a className="navbar-item has-text-grey-darker underline" href="/setting">
+                  Account Settings
+               </a>
+              <hr className="navbar-divider"></hr>
+              <a className="navbar-item has-text-grey-darker underline" href="/logout">
+                Logout
+              </a>
+            </div>
+          </div>
+        </div>
+      )
+    }
   }
 
   render() {
@@ -37,13 +87,7 @@ class Navbar extends React.Component {
 
           <div className={this.state.isActive ? "navbar-menu is-active" : "navbar-menu"}>
             <div className="navbar-end">
-              <div className="navbar-item">
-                <div className="buttons">
-                  <a className="button is-primary is-outlined is-inverted" href="/login">
-                    Login / Sign up
-                  </a>
-                </div>
-              </div>
+                { this.populateNavbar() }
             </div>
           </div>
         </nav>

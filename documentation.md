@@ -4,7 +4,8 @@ This is the REST API for skfs, which can be used to access the site to create bo
 
 ## Table of contents
 #### REST api
-* [POST /api/v1/token](#post-apiv1token)
+* [GET /api/v1/information](#get-apiv1information)
+* [GET /api/v1/information/token](#get-apiv1informationtoken)
 * [GET /api/v1/timeline](#get-apiv1timeline)
 * [GET /api/v1/posts/:id](#get-apiv1id)
 * [POST /api/v1/post](#post-apiv1post)
@@ -17,7 +18,6 @@ This is the REST API for skfs, which can be used to access the site to create bo
 * [DELETE /api/v1/reply](#delete-apiv1reply)
 * [GET /api/v1/users/:id](#get-apiv1usersid)
 #### Entities
-* [Token](#token)
 * [User](#user)
 * [Post](#post)
 * [Comment](#comment)
@@ -28,11 +28,9 @@ This is the REST API for skfs, which can be used to access the site to create bo
   * [history (type: 'COMMENT')](#history-type-comment)
   * [history (type: 'REPLY')](#history-type-reply)
 
-### POST /api/v1/token
+### POST /api/v1/information
 
-A session token to the client, which can be access actions only users can do.
-
-Returns [Token](#Token)
+Gets the information for the instance, such as the title of it and it's quick links.
 
 #### Resource Information
 
@@ -42,12 +40,25 @@ Returns [Token](#Token)
 | Requires token | No |
 | Available since | 0.0.0 |
 
+### POST /api/v1/information/token
+
+Returns the information about the user your token is for.
+
+Returns a [User.](#user)
+
+#### Resource Information
+
+| Information | ? |
+|-|-|
+| Response format | Json |
+| Requires token | Yes |
+| Available since | 0.0.0 |
+
 #### Paramaters
 
 | Name | Description | Required |
 | - | - | - |
-| username | The username of the user you want to log into. | Yes |
-| password | Password of the user you want to log into. | Yes |
+| token | Your personal token | Yes |
 
 ### GET /api/v1/timeline
 
@@ -236,11 +247,6 @@ Returns [User.](#user)
 ## Entities
 
 Entities in the skfs api. All dates are in ISO 8601 format.
-
-### Token
-| Attribute | Type | Added in |
-| - | - | - |
-| `token` | String | 0.0.0 |
 
 ### User
 | Attribute | Type | Added in |

@@ -11,3 +11,7 @@ server.js~
 client/*~
 client/public/index.html~
 client/public/index.js~
+.data
+server/build
+server/scss/main.scss~
+server/scss/stylesheet.css~

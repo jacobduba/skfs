@@ -21,18 +21,6 @@ function protect(req, res, next) {
 // helpers
 
 // routes
-// note to self that the plans are to replace this to make using the website mandatory and add control over with apps get to use it.
-router.post("/token", function(req, res) {
-  const account = db.prepare("SELECT * FROM users WHERE username = ?").get(req.body.username);
-  if (account == undefined) {
-    res.status(400).json({"status": 400, "message": "You have not supplied a user that exist."});
-  } else if (!bcrypt.compareSync(req.body.password, account.password)) {
-    res.status(400).json({"status": 400, "message": "You have the incorrect password for your user."});
-  } else {
-    res.status(200).json({"token": jwt.sign({ id: account.id }, process.env.SECRET)});
-  }
-});
-
 router.get("/posts/:id", function(req, res) {
   const post = db.prepare("SELECT * FROM posts WHERE id = ?").get(req.params.id);
   if (post == undefined)
@@ -255,6 +243,15 @@ router.get("/users/:id", function(req, res) {
   })
 });
 
+router.post("/information/token", protect, function(req, res) {
+  res.json({
+    id: req.account.id,
+    username: req.account.username,
+    bio: req.account.bio,
+    date_created: req.account.date
+  });
+});
+
 router.get("/timeline", function(req, res) {
   var response = [];
   for (const post of db.prepare("SELECT * FROM posts ORDER BY date DESC LIMIT 20").all()) {
@@ -322,10 +319,24 @@ router.get("/timeline", function(req, res) {
   res.status(200).json(response);
 });
 
+router.get("/information", function(req, res) {
+  links = [];
+  for (var thing of process.env.LINKS.split(";")) {
+    const ok = thing.split("|");
+    links.push({
+      name: ok[0],
+      url: ok[1]
+    })
+  }
+  res.status(200).json({
+    instanceName: process.env.INSTANCE_NAME,
+    links: links
+  });
+});
+
 module.exports = router;
 
 // notifications
 // get list of all users
-// get instance's quick links
 
 // future for api: random ids for some things?

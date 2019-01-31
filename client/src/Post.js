@@ -25,7 +25,7 @@ class Post extends React.Component {
 
   handleChange = (evt) => {
     this.setState({comment: evt.target.value});
-    if (evt.target.value.includes("<div><br></div>")) {
+    if (evt.target.value.includes("<br>")) {
       this.setState({comment: ""});
     }
   };
