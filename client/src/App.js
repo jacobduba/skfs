@@ -37,8 +37,8 @@ class App extends React.Component {
       <Router>
         <div>
           <Navbar user={this.state.user} />
-          <Route path="/" exact component={Timeline} />
-          <Route path="/posts/:id" component={Post} />
+          <Route path="/" exact component={(props) => <Timeline {...props} user={this.state.user} /> } />
+          <Route path="/posts/:id" component={(props) => <Post {...props} user={this.state.user} />} />
         </div>
       </Router>
       </div>

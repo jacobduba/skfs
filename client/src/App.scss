@@ -20,6 +20,11 @@ $navbar-item-hover-background-color: #fcc82a;
       font-family: 'Roboto Mono';
       font-weight: 700;
     }
+    .navbar-item {
+      @media screen and (max-width: 769px) {
+        width: calc(100% - 52px;)
+      }
+    }
   }
   .navbar-burger {
     &:hover {
@@ -31,6 +36,9 @@ $navbar-item-hover-background-color: #fcc82a;
    }
   .navbar-end {
     @media screen and (min-width: 769px) {
+      @media screen and (max-width: 1024px) {
+        padding-right: 2px;
+      }
       .navbar-item {
         .underline {
           text-decoration: underline;
@@ -53,7 +61,7 @@ $navbar-item-hover-background-color: #fcc82a;
       .navbar-item {
         color: white !important;
         font-family: 'Open Sans';
-        font-weight: 400;
+        font-weight: 700;
       }
     }
   }
@@ -74,9 +82,11 @@ p {
     list-style: none;
     overflow-x: auto;
     overflow-y:hidden;
+    -webkit-overflow-scrolling: touch;
     white-space: nowrap;
     background-color: #f7b900;
     padding: 5px 4px 5px 4px;
+    font-family: 'Roboto';
     a {
       color: white;
     }
@@ -121,6 +131,7 @@ p {
 }
 
 .media-options {
+  font-family: 'Roboto';
   ul {
     width: 100%;
     list-style: none;
@@ -137,15 +148,41 @@ p {
 
 .like-heart {
   font-size: 1.35em;
+  cursor: pointer;
+  &:hover {
+    animation-name: hoverlike;
+    animation-fill-mode: forwards;
+    animation-duration: .1s;
+    animation-timing-function: ease;
+    }
+  &:active {
+    animation-name: clicklike;
+    animation-fill-mode: forwards;
+    animation-duration: .1s;
+    animation-timing-function: ease;
+  }
 }
 
 .media-left {
   text-align: center;
   padding-top: 10px;
+  //width: 25px;
   p {
     font-family: "Roboto", sans-serif;
   }
 }
+
+@keyframes hoverlike {
+  100% {
+    transform: scale(1.07);
+  }
+}
+@keyframes clicklike {
+  100% {
+    transform: scale(0.8);
+  }
+}
+
 
 .post {
   border: 2px solid $white-ter;
@@ -222,6 +259,7 @@ p {
   }
   .reply-options {
     ul {
+      font-family: 'Roboto';
       width: 100%;
       list-style: none;
       margin: -13px 0px 0px 0px;

@@ -1,6 +1,7 @@
 import React from 'react';
 import Moment from 'react-moment';
 import User from './User.js';
+import PostSnippet from './PostSnippet.js';
 import ContentEditable from 'react-contenteditable';
 
 class Post extends React.Component {
@@ -27,6 +28,8 @@ class Post extends React.Component {
     this.setState({comment: evt.target.value});
     if (evt.target.value.includes("<br>")) {
       this.setState({comment: ""});
+      document.getElementById("terriblecode").blur();
+
     }
   };
 
@@ -36,29 +39,8 @@ class Post extends React.Component {
     return(
      <div className="good-container">
       <div className="post">
-        <article className="media">
-            <figure className="media-left">
-              <div>
-                <p>{this.state.post.likes.length}</p>
-                <i class="fa like-heart fa-heart-o" aria-hidden="true"></i>
-              </div>
-            </figure>
-            <div className="media-content">
-                <div className="content">
-                  <p>
-                  <span className="media-title has-text-dark">{this.state.post.title}</span>
-                  <span className="media-details has-text-grey-light">Posted by <User user={this.state.post.user} /> <Moment fromNow>{this.state.post.date_created}</Moment></span>
-                  </p>
-                  <div className="media-options">
-                    <ul>
-                      <li>{this.state.post.comments.length} COMMENT{(this.state.post.comments.length === 1) ? '' : 'S'}</li>
-                      <li>LIKED BY</li>
-                      <li>SHARE</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </article>
+
+            <PostSnippet post={this.state.post} user={this.props.user}/>
             <article className="media">
               <p className="content">{this.state.post.content}</p>
             </article>
@@ -70,7 +52,7 @@ class Post extends React.Component {
               <div className="content">
                 <div className="write-comment">
                   <div className="a-textarea this-is-the-comment">
-                    <ContentEditable html={this.state.comment} data-text="Write your comment here..." onChange={this.handleChange} />
+                    <ContentEditable html={this.state.comment} data-text="Write your comment here..." id="terriblecode" onChange={this.handleChange} />
                   </div>
                 </div>
               </div>
