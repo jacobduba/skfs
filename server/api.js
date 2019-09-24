@@ -171,6 +171,8 @@ router.delete("/comment", protect, function(req, res) {
   const comment = db.prepare("SELECT * FROM comments WHERE id = ?").get(req.body.comment_id);
   if (comment == undefined)
     res.status(404).json({"status": 404, "message": "Comment that you provided with the 'comment' paramater does not exist."});
+  else if (comment.trim().length == 0)
+    res.status(404).json({"status": 403, "message": "Comment cannot be blank spaces..."});
   else if (comment.user_id != req.account.id)
     res.status(403).json({"status": 403, "message": "You do not have the right to delete this comment."});
   else {

@@ -3,6 +3,9 @@ import Moment from 'react-moment';
 import User from './User.js';
 import PostSnippet from './PostSnippet.js';
 import ContentEditable from 'react-contenteditable';
+import Cookies from "universal-cookie";
+
+const cookies = new Cookies();
 
 class Post extends React.Component {
   constructor(props) {
@@ -27,6 +30,21 @@ class Post extends React.Component {
   handleChange = (evt) => {
     this.setState({comment: evt.target.value});
     if (evt.target.value.includes("<br>")) {
+      fetch ("/api/v1/posts/" + this.state.post.id + "/comment", {
+        method: "POST",
+        body: JSON.stringify({
+          token: cookies.get('token'),
+          comment: this.state.comment
+        }),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }).then(res => res.json())
+        .then(res => {
+          if (res.status == 200) {
+            console.log("hey! :)");
+          }
+        })
       this.setState({comment: ""});
       document.getElementById("terriblecode").blur();
 
@@ -54,6 +72,9 @@ class Post extends React.Component {
                   <div className="a-textarea this-is-the-comment">
                     <ContentEditable html={this.state.comment} data-text="Write your comment here..." id="terriblecode" onChange={this.handleChange} />
                   </div>
+                  <button class="a-submit-button">
+                    Ok
+                  </button>
                 </div>
               </div>
             </div>
