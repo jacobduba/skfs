@@ -1,6 +1,8 @@
 SKFS is a web 2.0 application where users can sign up/sign
 in to create, like, and comment on posts.
 
+![Screenshot 2021-12-29 at 20-11-01 Screenshot](https://user-images.githubusercontent.com/11655457/147716369-ac51a1c3-0696-43a3-8d0e-dc983c41a688.png)
+
  - Designed with a robust client-server [REST API](https://github.com/mooshoe/skfs/blob/master/documentation.md).
  - Back end uses Express.js with SQLite.
  - Front end developed in React.
