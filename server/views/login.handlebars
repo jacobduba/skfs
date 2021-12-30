@@ -12,16 +12,16 @@
     <div class="container">
       <div class="login-span"></div>
       <div class="login-everything">
-        <p class="login-title main-title">Login to this instance,</p>
+        <p class="login-title main-title">Login</p>
         <div class="login-box">
           <form method="post">
             {{#if loginError }}
               <div class="error">
-                oh shit im sorry it appears that your login information is not correct
+                Invalid username and/or password.
               </div>
             {{/if}}
             <span class="login-desc">email:</span><br>
-            <input type="text" placeholder="eg jacob@dolt.com" name="email"></input>
+            <input type="text" placeholder="eg name@website.com" name="email"></input>
             <span class="login-desc">password:</span><br>
             <input type="password" placeholder="put your password here" name="password"></input>
             <ul>
@@ -29,15 +29,15 @@
             </ul>
           </form>
         </div>
-        <p class="login-title">Sign up down here!</p>
+        <p class="login-title">Sign up</p>
         <div class="login-box">
           <form>
             <span class="login-desc">email:</span><br>
-            <input type="text" placeholder="eg pleb@idontuseskfsyet.com"></input>
+            <input type="text" placeholder="eg name@website.com"></input>
             <span class="login-desc">pick a username:</span>
-            <input type="text" placeholder="a really good one is 'mooshoe'"></input>
+            <input type="text" placeholder="must be between 3 and 10 characters"></input>
             <span class="login-desc">choose a password:</span><br>
-            <input type="password" placeholder="make sure your password is super good ok bye"></input>
+            <input type="password" placeholder="make it secure"></input>
             <ul>
               <div class="login-submit"><ul><li class="right"><input type="submit" value="Register"></input></li></ul></div>
             </ul>
